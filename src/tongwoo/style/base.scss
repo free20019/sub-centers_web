@@ -1,0 +1,46 @@
+@import "./base-variable.scss";
+
+.tw-template {
+  &-wrapper {
+    height: 100%;
+    > .tw-layout-left {
+      border-right: 1px solid #eeeeee;
+    }
+  }
+  &-body {
+    height: 100%;
+    transition: width 0.5s ease, margin-left 0.5s ease;
+  }
+}
+
+.tw-block {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tw-icon {
+  &-rotate {
+    transform: rotate(180deg);
+  }
+}
+
+.tw-scrollbar {
+  position: relative;
+  height: 100%;
+  &__wrapper {
+    height: 100%;
+  }
+  &.ps {
+    .ps {
+      &__rail-x:hover,
+      &__rail-y:hover,
+      &__rail-x:focus,
+      &__rail-y:focus,
+      &__rail-x.ps--clicking,
+      &__rail-y.ps--clicking {
+        background-color: transparent;
+      }
+    }
+  }
+}

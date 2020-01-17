@@ -1,0 +1,74 @@
+.tw-query {
+  $height: 55px;
+  &-panel {
+    position: relative;
+    height: 100%;
+    box-sizing: border-box;
+
+    // &.tw-auto {
+    // overflow: auto;
+    // }
+  }
+  &-bar {
+    padding: $margin $margin 0 $margin;
+    border-bottom: 1px solid $borderColor_default;
+    box-sizing: border-box;
+    .el-form-item {
+      margin-bottom: $margin;
+      &.el-form-item--mini,
+      &.el-form-item--small {
+        margin-bottom: $margin;
+      }
+    }
+  }
+  &-wrapper {
+    height: calc(100% - #{$height});
+    padding: $margin;
+    box-sizing: border-box;
+  }
+  &-footer {
+    padding: $margin;
+    border-top: 1px solid #eeeeee;
+    box-sizing: border-box;
+  }
+}
+
+.tw-form {
+  margin-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  &:first-child {
+    padding-top: 10px;
+  }
+  &:last-child {
+    margin-bottom: 0;
+  }
+  .el-form {
+    &-item {
+      &:last-child {
+        margin-bottom: 0;
+      }
+      &,
+      &.el-form-item--mini,
+      &.el-form-item--small {
+        margin-bottom: 10px;
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+      &__content {
+        & > .el-input,
+        & > .el-select,
+        & > .el-button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.el-input__icon.iconfont {
+  display: inline-block;
+  width: 25px;
+  text-align: center;
+}

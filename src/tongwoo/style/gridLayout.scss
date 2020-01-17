@@ -1,0 +1,9 @@
+.tw-grid-layout {
+  overflow: auto;
+  height: 100%;
+  box-sizing: border-box;
+  > .tw-panel {
+    float: left;
+    box-sizing: border-box;
+  }
+}

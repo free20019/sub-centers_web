@@ -1,0 +1,45 @@
+@import "./tabs-variable";
+
+.tw-tabs {
+  height: 100%;
+  @include el-tab__default;
+  &.el-tabs {
+    &--card {
+      box-sizing: border-box;
+      @include el-tabs--card;
+    }
+    &--border-card {
+      box-sizing: border-box;
+      @include el-tabs--border-card;
+    }
+    &--bottom {
+      .el-tabs {
+        &__header.is-bottom {
+          margin-top: -1px;
+          box-sizing: border-box;
+        }
+      }
+    }
+  }
+  &-panel {
+    height: 100%;
+    @include tw-tabs-panel;
+
+    &__toolbar {
+      position: relative;
+      .el-tabs__header {
+        .el-tabs__nav-wrap.is-scrollable {
+          .el-tabs__nav-next::after {
+            border-right: 1px solid #dcdfe6;
+          }
+        }
+      }
+    }
+  }
+  &-toolbar {
+    position: absolute;
+    right: 0;
+    padding: 4px 5px;
+    z-index: 10;
+  }
+}
