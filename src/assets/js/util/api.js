@@ -1,6 +1,14 @@
+/*
+ * @Descripttion:
+ * @version:
+ * @Author: CFQ
+ * @Date: 2020-03-10 09:58:02
+ * @LastEditors: CFQ
+ * @LastEditTime: 2020-03-10 10:59:29
+ */
 import { Message } from 'element-ui'
-// export const baseURL = process.env.NODE_ENV !== 'production' ? '/api/' : ''
-export const baseURL = 'http://192.168.11.237:8086/subcenters/'
+export const baseURL = process.env.NODE_ENV !== 'production' ? '/subcenters/' : ''
+// export const baseURL = 'http://192.168.11.237:8086/subcenters/'
 
 /**
  * 返回API接口的状态类型

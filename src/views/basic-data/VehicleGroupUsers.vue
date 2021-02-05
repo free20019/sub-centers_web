@@ -86,6 +86,16 @@
             ></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="地图中心点">
+          <el-select v-model="dialog.form.center" placeholder="地图中心点" style="width: 560px;">
+            <el-option
+              v-for="item in center"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialog.display = false">取 消</el-button>
@@ -126,9 +136,35 @@ export default {
           password: '',
           station: '',
           clzm:[],
-          id: ''
+          id: '',
+          center: '120.19323,30.273969'
         }
-      }
+      },
+      center:[{
+          value: '120.19323,30.273969', 
+          label: '主城区'
+        },{
+          value: '120.321289,30.404195',
+          label: '余杭区'
+        },{
+          value: '120.292808,30.160695',
+          label: '萧山区'
+        }, {
+          value: '119.710775,30.225034',
+          label: '临安区'
+        }, {
+          value: '119.931332,30.060479',
+          label: '富阳区'
+        }, {
+          value: '119.071183,29.610557',
+          label: '淳安区'
+        }, {
+          value: '119.291417,29.479555',
+          label: '建德市'
+        }, {
+          value: '120.89942,29.507935',
+          label: '新昌县'
+        }]
     }
   },
   mounted() {
@@ -180,6 +216,7 @@ export default {
       params.append('REALNAME', this.dialog.form.real_name)
       params.append('CLZM', this.dialog.form.clzm)
       params.append('STATION_ID', this.dialog.form.station)
+      params.append('CENTER', this.dialog.form.center)
       axios.post('map/adddlclzzhb', params, { baseURL }).then(res => {
         this.dialog.display = false
         this.$message(res.data.info);
@@ -194,6 +231,7 @@ export default {
       params.append('CLZM', this.dialog.form.clzm)
       params.append('STATION_ID', this.dialog.form.station)
       params.append('ID', this.dialog.form.id)
+      params.append('CENTER', this.dialog.form.center)
       console.log(this.dialog.form.clzm)
       axios.post('map/editdlclzzhb', params, { baseURL }).then(res => {
         this.dialog.display = false
@@ -214,6 +252,7 @@ export default {
       this.dialog.form.username = item.USERNAME
       this.dialog.form.password = item.PASSWORD
       this.dialog.form.station = item.STATION_ID
+      this.dialog.form.center = item.CENTER
       this.dialog.form.clzm = item.CLZS.split(',')
     },
     handleTableDeleteClick(item) {

@@ -1,4 +1,4 @@
-<!-- 车辆监控 消息下发 -->
+<!-- 终端设置 消息下发 -->
 <template>
   <t-layout border right="500">
     <el-form class="tw-form" :model="form" label-width="80px">

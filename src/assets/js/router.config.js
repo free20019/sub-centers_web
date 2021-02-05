@@ -119,6 +119,11 @@ export function getRouters(filters) {
       name: '投诉查询',
       component: () => import('views/query-analysis/ComplaintInquiry.vue')
     },
+    {
+      path: '/cljk/dxbjjl',
+      name: '短信报警记录',
+      component: () => import('views/query-analysis/MessageAlarmRecord.vue')
+    },
     /**数据查询 */
     {
       path: '/sjtj/szltj',
@@ -258,6 +263,41 @@ export function getRouters(filters) {
       path: '/hjgl/bgtj',
       name: '变更统计',
       component: () => import('views/mail-manage/ChangeStatistics.vue')
+    },
+    {
+      path: '/hjgl/axywycjl',
+      name: '爱心业务用车记录',
+      component: () =>
+        import('views/mail-manage/LoveBusinessVehicleUseRecord.vue')
+    },
+    {
+      path: '/hjgl/cljsygl',
+      name: '爱心驾驶员信息管理',
+      component: () => import('views/mail-manage/VehicleDiverManagement.vue')
+    },
+    /** 终端设置 */
+    {
+      path: '/zdsz/fwpjsj',
+      name: '服务评价数据',
+      component: () =>
+        import('./views/terminal-settings/ServiceEvaluationData.vue')
+    },
+    {
+      path: '/zdsz/zdxxxf',
+      name: '消息下发',
+      component: () => import('./views/terminal-settings/MessageSent.vue')
+    },
+    {
+      path: '/zdsz/ddsjtc',
+      name: '顶灯数据透传',
+      component: () =>
+        import('./views/terminal-settings/CeilingLampDataTransmission.vue')
+    },
+    {
+      path: '/zdsz/jjbjclcl',
+      name: '紧急报警车辆处理',
+      component: () =>
+        import('./views/terminal-settings/EmergencyAlarmVehicle.vue')
     }
   ]
 

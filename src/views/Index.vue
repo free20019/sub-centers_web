@@ -21,17 +21,21 @@
             @menu-item-click="handleMenuItemClick(child)"
           >
             <i class="tw-icon-img" :class="child.icon"></i>
-            <span class="tw-title">{{child.title}}</span>
+            <span class="tw-title">{{ child.title }}</span>
           </t-menu-item>
         </t-menu-group>
         <transition name="menu-modal">
-          <div class="tw-menu-modal" v-if="menuGroupActive" @click="handleMenuModalClick"></div>
+          <div
+            class="tw-menu-modal"
+            v-if="menuGroupActive"
+            @click="handleMenuModalClick"
+          ></div>
         </transition>
       </div>
       <div class="tw-system-box">
         <div class="tw-system-item">
           <i class="el-icon-user"></i>
-          {{realname}}
+          {{ realname }}
         </div>
         <div class="tw-system-item">
           <i class="el-icon-switch-button" @click="handleCloseClick"></i>
@@ -39,7 +43,7 @@
       </div>
       <div class="tw-heading-box">
         <i class="el-icon-caret-right"></i>
-        {{routerName}}
+        {{ routerName }}
       </div>
     </template>
     <keep-alive>
@@ -47,20 +51,62 @@
     </keep-alive>
     <div
       class="tw-box tw-call-police iconfont icon-call-police"
-      :class="{alarm: table.isAlarmNum}"
+      :class="{ alarm: table.isAlarmNum }"
       @click="handleCallPoliceClick"
     >
-      <div class="tw-num" v-if="table.isAlarmNum">{{table.num}}</div>
+      <div class="tw-num" v-if="table.isAlarmNum">{{ table.num }}</div>
     </div>
-    <el-dialog class="tw-dialog" :title="dialog.title" :visible.sync="dialog.display" width="900px">
+    <el-dialog
+      class="tw-dialog"
+      :title="dialog.title"
+      :visible.sync="dialog.display"
+      width="900px"
+    >
       <t-table-page :data="table.data" height="560" :page-size="table.pageSize">
-        <el-table-column type="index" label="编号" align="center" width="60"></el-table-column>
-        <el-table-column prop="COMP_NAME" label="公司名称" align="center" width="250"></el-table-column>
-        <el-table-column prop="VEHI_NO" label="车牌号码" align="center" width="90"></el-table-column>
-        <el-table-column prop="MDT_NO" label="终端编号" align="center" width="110"></el-table-column>
-        <el-table-column prop="VEHI_SIM" label="SIM卡号" align="center" width="100"></el-table-column>
-        <el-table-column prop="SPEED" label="速度(KM/H)" align="center" width="90"></el-table-column>
-        <el-table-column prop="STIME" label="报警时间" align="center"  min-width="130" show-overflow-tooltip :resizable="false">
+        <el-table-column
+          type="index"
+          label="编号"
+          align="center"
+          width="60"
+        ></el-table-column>
+        <el-table-column
+          prop="COMP_NAME"
+          label="公司名称"
+          align="center"
+          width="250"
+        ></el-table-column>
+        <el-table-column
+          prop="VEHI_NO"
+          label="车牌号码"
+          align="center"
+          width="90"
+        ></el-table-column>
+        <el-table-column
+          prop="MDT_NO"
+          label="终端编号"
+          align="center"
+          width="110"
+        ></el-table-column>
+        <el-table-column
+          prop="VEHI_SIM"
+          label="SIM卡号"
+          align="center"
+          width="100"
+        ></el-table-column>
+        <el-table-column
+          prop="SPEED"
+          label="速度(KM/H)"
+          align="center"
+          width="90"
+        ></el-table-column>
+        <el-table-column
+          prop="STIME"
+          label="报警时间"
+          align="center"
+          min-width="130"
+          show-overflow-tooltip
+          :resizable="false"
+        >
           <template slot-scope="scope">
             <span v-text="stime(scope.row.STIME)"></span>
           </template>
@@ -99,7 +145,7 @@ export default {
     this.getLoginType()
     this.getMenuList()
     this.getEmergencyAlarm()
-    setInterval(this.getEmergencyAlarm,1000*30)
+    setInterval(this.getEmergencyAlarm, 1000 * 30)
   },
   computed: {
     ...mapState(['username']),
@@ -112,34 +158,32 @@ export default {
       return moment(date).format('YYYY-MM-DD HH:mm:ss')
     },
     getLoginType() {
-      axios.get('map/loginType' ,{baseURL}).then(res =>{
-        console.log('dl:',res.data.loginType)
-        console.log(2222,res.data.userId)
+      console.log(baseURL,'map/loginType')
+      axios.get('map/loginType', { baseURL }).then(res => {
         this.$cookies.set('loginType', res.data.loginType)
         this.$cookies.set('userId', res.data.userId)
       })
     },
     getMenuList() {
       axios.get('map/getUser', { baseURL }).then(res => {
-        console.log(res.data)
-        if(res.data.power == 'null'){
-          this.$router.push({name: '登录'})
-        }else{
+        if (res.data.power == 'null') {
+          this.$router.push({ name: '登录' })
+        } else {
           this.realname = res.data.realname
-          const power = res.data.power
-          console.info('getMenuList:', this)
+          console.log(res.data.power)
+          const power = res.data.power.split(',')
           this.menuList = getMenu(power)
+          this.$cookies.set('center', res.data.center)
         }
       })
-      // const power ='cssz,xxxf,lsgj,wzjk,dcjk,tysp,fpjk,qyjk,hksp,yyrb,wzcx,yysjtj,yyjlcx,xxjlcx,czsw,wxjlcx,sdqxbb,yyyb,zrsq,bttj,clzgl,cltj,wsxcl,sxwyy,dccltj,clsxtj,yywsx,wsxwyy,wsxwyy,wysjcl,gwgl,yhgl,ptsyjl,qygl,zcsq,bgtj,btsq,bgsq,zrtj,zctj,tscx,sjjrsq,wqdqt,dlclzgl,clzyhgl,czswbf,szltj,wkzcbh'
-      // this.menuList = getMenu(power)
+      // const power = 'jjbjclcl,ddsjtc,zdxxxf,fwpjsj,cssz,xxxf,lsgj,wzjk,dcjk,tysp,fpjk,qyjk,hksp,yyrb,wzcx,yysjtj,yyjlcx,xxjlcx,czsw,wxjlcx,sdqxbb,yyyb,zrsq,bttj,clzgl,cltj,wsxcl,sxwyy,dccltj,clsxtj,yywsx,wsxwyy,wsxwyy,wysjcl,gwgl,yhgl,ptsyjl,qygl,zcsq,bgtj,axywycjl,cljsygl,btsq,bgsq,zrtj,zctj,tscx,sjjrsq,wqdqt,dlclzgl,clzyhgl,czswbf,szltj,wkzcbh'
+      // this.menuList = getMenu(power.split(','))
     },
     handleMenuGroupTitleClick(id) {
       if (this.menuGroupActive === id) this.menuGroupActive = ''
       else this.menuGroupActive = id
     },
     handleMenuItemClick(item) {
-      console.log(item)
       if (item.title == '通用视频') {
         axios
           .post(
@@ -164,23 +208,24 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        axios.get('map/logout', { baseURL }).then(res => {
-        })
+        axios.get('map/logout', { baseURL }).then(res => {})
         this.$store.commit('LOGIN', { name: '', power: [] })
         this.$router.push({ name: '登录' })
       })
     },
     handleCallPoliceClick() {
-      if(this.table.num>0)
-        this.dialog.display = true
+      if (this.table.num > 0) this.dialog.display = true
     },
     getEmergencyAlarm() {
       axios.get('map/getMonitor', { baseURL }).then(res => {
         let vehilist = Object.freeze(res.data.vehilist)
         let one = ''
         let data = []
-        for(let i=0; i<vehilist.length; i++){
-          if(new Date().getTime() - parseFloat(vehilist[i].STIME) <= 1000*60*5){
+        for (let i = 0; i < vehilist.length; i++) {
+          if (
+            new Date().getTime() - parseFloat(vehilist[i].STIME) <=
+            1000 * 60 * 5
+          ) {
             if (vehilist[i].ALARMSTATUS.length == 8) {
               one = vehilist[i].ALARMSTATUS.substring(7, 8)
               if (
@@ -199,7 +244,7 @@ export default {
           }
         }
         this.table.data = data
-        if(data.length>0){
+        if (data.length > 0) {
           this.table.num = data.length
           this.table.isAlarmNum = true
         }
@@ -209,8 +254,7 @@ export default {
 }
 </script>
 
-<style lang="scss" >
-</style>
+<style lang="scss"></style>
 <style lang="scss" scoped>
 .tw-menu {
   &-modal {
@@ -339,4 +383,3 @@ export default {
   }
 }
 </style>
-

@@ -217,6 +217,7 @@ export default {
       return moment(date).format('YYYY-MM-DD HH:mm:ss')
     },
     getMonitor() {
+      if(this.$route.path != '/cljk/qyjk') return
       axios.get('map/getMonitor', { baseURL }).then(res => {
         console.log(res.data)
         const { num, arealist, vehilist } = Object.freeze(res.data)

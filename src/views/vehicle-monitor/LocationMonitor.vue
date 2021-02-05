@@ -1,68 +1,147 @@
 <!-- 位置监控 -->
 <template>
-  <t-layout class="tw-template-wrapper">
+  <t-layout class="tw-template-wrapper" :leftBtnStrip="true">
     <template v-slot:left>
-      <real-time-monitor-vehicle-panel :vhic.sync="table.positionInfo.data" :ischeckbox="true"></real-time-monitor-vehicle-panel>
+      <real-time-monitor-vehicle-panel
+        :vhic.sync="table.positionInfo.data"
+        :ischeckbox="true"
+        ref="leftPanel"
+      ></real-time-monitor-vehicle-panel>
     </template>
-    <t-layout footer="300">
+    <t-layout footer="300" :footerStrip="true">
       <div class="tw-map-panel">
         <div id="baidu-map" class="tw-map-panel"></div>
         <div class="tw-map-prompt-bar">
           <div class="tw-map-item">
             总数：
-            <span>{{vehicleStatus.total}}</span>辆
+            <span>{{ vehicleStatus.total }}</span
+            >辆
           </div>
           <div class="tw-map-item">
             上线：
-            <span>{{vehicleStatus.online}}</span>辆
+            <span>{{ vehicleStatus.online }}</span
+            >辆
           </div>
           <div class="tw-map-item">
             下线：
-            <span>{{vehicleStatus.notOnline}}</span>辆
+            <span>{{ vehicleStatus.notOnline }}</span
+            >辆
           </div>
           <div class="tw-map-item">
             重车：
-            <span>{{vehicleStatus.heavyCar}}</span>辆
+            <span>{{ vehicleStatus.heavyCar }}</span
+            >辆
           </div>
           <div class="tw-map-item">
             空车：
-            <span>{{vehicleStatus.emptyCar}}</span>辆
+            <span>{{ vehicleStatus.emptyCar }}</span
+            >辆
           </div>
         </div>
       </div>
       <template v-slot:footer>
-        <t-tabs :active.sync="tabs.active" specified-display="locationMonitor" @tab-click="locationClick">
+        <t-tabs
+          :active.sync="tabs.active"
+          specified-display="locationMonitor"
+          @tab-click="locationClick"
+        >
           <template v-slot:toolbar>
             <el-button type="primary" @click="tableListDC">导出</el-button>
           </template>
           <el-tab-pane label="位置信息" name="locationMonitor">
-            <pl-table :datas="positionInfo"
-                      class="tw-table tw-table__towLines tw-item__click"
-                      size="small"
-                      header-drag-style
-                      :pagination-show=false
-                      use-virtual
-                      @row-click="rowclick"
-                      :row-height="50">
-              <pl-table-column type="index" label="序号" width="50" align="center"></pl-table-column>
-              <pl-table-column prop="VEHI_NO" label="车牌号码" min-width="100" align="center"></pl-table-column>
-              <pl-table-column prop="COMP_NAME" label="分公司" min-width="260" align="center"></pl-table-column>
-              <pl-table-column prop="MDT_SUB_TYPE" label="终端类型" width="120" align="center"></pl-table-column>
-              <pl-table-column prop="SFJQ" label="精确度" width="120" align="center"></pl-table-column>
-              <pl-table-column prop="VEHI_SIM" label="SIM卡号" width="120" align="center"></pl-table-column>
-              <pl-table-column prop="MDT_NO" label="终端编号" width="120" align="center"></pl-table-column>
-              <pl-table-column prop="STIME" label="GPS时间" width="160" align="center">
-              <template slot-scope="scope">
-              <span v-text="stime(scope.row.STIME)"></span>
-              </template>
+            <pl-table
+              :datas="positionInfo"
+              class="tw-table tw-table__towLines tw-item__click"
+              size="small"
+              header-drag-style
+              :pagination-show="false"
+              use-virtual
+              @row-click="rowclick"
+              :row-height="50"
+            >
+              <pl-table-column
+                type="index"
+                label="序号"
+                width="50"
+                align="center"
+              ></pl-table-column>
+              <pl-table-column
+                prop="VEHI_NO"
+                label="车牌号码"
+                min-width="100"
+                align="center"
+              ></pl-table-column>
+              <pl-table-column
+                prop="COMP_NAME"
+                label="分公司"
+                min-width="260"
+                align="center"
+              ></pl-table-column>
+              <pl-table-column
+                prop="MDT_SUB_TYPE"
+                label="终端类型"
+                width="120"
+                align="center"
+              ></pl-table-column>
+              <pl-table-column
+                prop="SFJQ"
+                label="精确度"
+                width="120"
+                align="center"
+              ></pl-table-column>
+              <pl-table-column
+                prop="VEHI_SIM"
+                label="SIM卡号"
+                width="120"
+                align="center"
+              ></pl-table-column>
+              <pl-table-column
+                prop="MDT_NO"
+                label="终端编号"
+                width="120"
+                align="center"
+              ></pl-table-column>
+              <pl-table-column
+                prop="STIME"
+                label="GPS时间"
+                width="160"
+                align="center"
+              >
+                <template slot-scope="scope">
+                  <span v-text="stime(scope.row.STIME)"></span>
+                </template>
               </pl-table-column>
-              <pl-table-column prop="SPEED" label="GPS速度" width="100" align="center"></pl-table-column>
-              <pl-table-column prop="STATE" label="车辆状态" width="100" align="center">
+              <pl-table-column
+                prop="SPEED"
+                label="GPS速度"
+                width="100"
+                align="center"
+              >
               <template slot-scope="scope">
-              <span v-text="stateType(scope.row)" :style="{ color: typeColor(scope.row)}"></span>
-              </template>
+                  <span
+                    v-text="speedType(scope.row)"
+                  ></span>
+                </template>
               </pl-table-column>
-              <pl-table-column prop="ANGLE" label="方向" width="100" align="center"></pl-table-column>
+              <pl-table-column
+                prop="STATE"
+                label="车辆状态"
+                width="100"
+                align="center"
+              >
+                <template slot-scope="scope">
+                  <span
+                    v-text="stateType(scope.row)"
+                    :style="{ color: typeColor(scope.row) }"
+                  ></span>
+                </template>
+              </pl-table-column>
+              <pl-table-column
+                prop="ANGLE"
+                label="方向"
+                width="100"
+                align="center"
+              ></pl-table-column>
             </pl-table>
           </el-tab-pane>
           <el-tab-pane
@@ -72,7 +151,12 @@
             style="position: relative;height: 100%"
           >
             <div v-for="(item, index) in table.monitorInfo" :key="index">
-              <div @click="mapInfoOpen(item)">{{ item.VEHI_NO }} - {{ formatterDateTime(item.STIME) }} - {{ item.SPEED }}KM/H - {{ item.PX }},{{ item.PY }} - 方向:{{ formatterDirectionType(item.ANGLE) }}</div>
+              <div @click="mapInfoOpen(item)">
+                {{ item.VEHI_NO }} - {{ formatterDateTime(item.STIME) }} -
+                {{ item.SPEED }}KM/H - {{ item.PX }},{{ item.PY }} - 方向:{{
+                  formatterDirectionType(item.ANGLE)
+                }}
+              </div>
             </div>
           </el-tab-pane>
           <el-tab-pane
@@ -82,10 +166,12 @@
             style="position: relative;height: 100%"
           >
             <div v-for="(item, index) in table.importantInfo" :key="index">
-              <el-link
-                type="primary"
-                @click="imInfoMapInfoOpen(item)"
-              >车牌：{{ item.OPERATION_VEHICLENO }} - 签到时间：{{ formatterDateTime(item.LOGINTIME) }} - 签退时间：{{ formatterDateTime(item.LOGOUTTIME) }}</el-link>
+              <el-link type="primary" @click="imInfoMapInfoOpen(item)"
+                >车牌：{{ item.OPERATION_VEHICLENO }} - 签到时间：{{
+                  formatterDateTime(item.LOGINTIME)
+                }}
+                - 签退时间：{{ formatterDateTime(item.LOGOUTTIME) }}</el-link
+              >
             </div>
           </el-tab-pane>
           <el-tab-pane
@@ -95,10 +181,12 @@
             style="position: relative;height: 100%"
           >
             <div v-for="(item, index) in table.alarmInfo" :key="index">
-              <el-link
-                type="primary"
-                @click="mapInfoOpen(item)"
-              >车牌：{{ item.VEHI_NO }} - 报警时间：{{ formatterDateTime(item.STIME) }} - 报警类型：{{ item.ALARM }}</el-link>
+              <el-link type="primary" @click="mapInfoOpen(item)"
+                >车牌：{{ item.VEHI_NO }} - 报警时间：{{
+                  formatterDateTime(item.STIME)
+                }}
+                - 报警类型：{{ item.ALARM }}</el-link
+              >
             </div>
           </el-tab-pane>
           <el-tab-pane
@@ -110,8 +198,8 @@
             <div v-for="(item, index) in table.alarmList" :key="index">
               车牌：{{ item.VEHICLE_NUM }} - 报警类型：{{ item.ALARMSTATUS }}
               <!--<el-link-->
-                <!--type="primary"-->
-                <!--@click="mapInfoOpen(item)"-->
+              <!--type="primary"-->
+              <!--@click="mapInfoOpen(item)"-->
               <!--&gt;车牌：{{ item.VEHI_NO }} - 报警时间：{{ formatterDateTime(item.STIME) }} - 报警类型：{{ item.ALARM }}</el-link>-->
             </div>
           </el-tab-pane>
@@ -127,32 +215,54 @@
     >
       <el-form class="tw-form" :model="dialog.form" label-width="80px">
         <el-form-item label="消息内容">
-          <el-input type="textarea" :rows="8" placeholder="请输入消息内容" v-model="dialog.form.center"></el-input>
+          <el-input
+            type="textarea"
+            :rows="8"
+            placeholder="请输入消息内容"
+            v-model="dialog.form.center"
+          ></el-input>
         </el-form-item>
         <el-form-item label="定制消息">
           <div class="tw-list">
             <div
               class="tw-list-item"
-              :class="{active: messageIndex === index}"
-              v-for="(item,index) in messageList"
+              :class="{ active: messageIndex === index }"
+              v-for="(item, index) in messageList"
               :key="index"
               @click="handleMessageInfoClick(index)"
               @dblclick="handleMessageinfoDblclick(item.INFO)"
             >
               <t-icon class="tw-icon" name="icon-arrowTria"></t-icon>
-              <span>{{item.INFO}}</span>
+              <span>{{ item.INFO }}</span>
             </div>
           </div>
           <div style="text-align: center;">
-            <el-button type="primary" size="small" @click="handleMessageAddClick">添加</el-button>
-            <el-button type="primary" size="small" @click="handleMessageEditClick">修改</el-button>
-            <el-button type="primary" size="small" @click="handleMessageDeleteClick">删除</el-button>
+            <el-button
+              type="primary"
+              size="small"
+              @click="handleMessageAddClick"
+              >添加</el-button
+            >
+            <el-button
+              type="primary"
+              size="small"
+              @click="handleMessageEditClick"
+              >修改</el-button
+            >
+            <el-button
+              type="primary"
+              size="small"
+              @click="handleMessageDeleteClick"
+              >删除</el-button
+            >
           </div>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="handleDialogCancelClick">取 消</el-button>
-        <el-button type="primary" @click="handleDialogDefineClick">发 送</el-button>
+        <el-button type="primary" @click="handleDialogDefineClick"
+          >发 送</el-button
+        >
       </div>
     </el-dialog>
     <el-dialog
@@ -164,7 +274,11 @@
     >
       <el-form class="tw-form" :model="dialog1.form" label-width="80px">
         <el-form-item label="消息内容">
-          <el-input v-model="dialog1.form.name" type="textarea" rows="4"></el-input>
+          <el-input
+            v-model="dialog1.form.name"
+            type="textarea"
+            rows="4"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer">
@@ -176,11 +290,19 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable'
+
 import axios from 'axios'
+import {mapState} from 'vuex'
 import _ from 'underscore'
 import AMap from 'AMap'
 import AMapUI from 'AMapUI'
-import { baseURL, formatterDirectionType, formatterDateTime } from 'util'
+import {
+  baseURL,
+  formatterDirectionType,
+  formatterDateTime,
+  direction
+} from 'util'
 import RealTimeMonitorVehiclePanel from 'components/RealTimeMonitorVehiclePanel'
 import moment from 'moment'
 import $ from 'jquery'
@@ -228,6 +350,7 @@ export default {
         active: 'locationMonitor'
       },
       map: null,
+      mapCenters: this.mapCenter,
       colors: [
         '#3366cc',
         '#dc3912',
@@ -291,7 +414,9 @@ export default {
           id: ''
         }
       },
-      iswzjk: true
+      iswzjk: true,
+      changeBtn: 'el-icon-caret-right',
+      changeWrapper: 300
     }
   },
   mounted() {
@@ -300,6 +425,14 @@ export default {
         resizeEnable: true, //是否监控地图容器尺寸变化
         zoom: 12
       })
+      this.getMenuList()
+      // setTimeout(()=>{
+      //   let center = this.$cookies.get('center')
+      //   console.log('center2',center)
+      //   if(center.split(',').length ==2)
+      //     this.map.setCenter([center.split(',')[0], center.split(',')[1]])
+      // },1000)
+      
       this.getVehiMap()
       this.getAlarm()
       this.setintervalLM = setInterval(this.getVehiMap1, 30000)
@@ -307,34 +440,64 @@ export default {
     })
   },
   computed: {
+    // ...mapState(['mapCenter']),
     positionInfo() {
       return this.table.data
     }
   },
   methods: {
+    getMenuList() {
+      axios.get('map/getCenter', { baseURL }).then(res => {
+        console.log('res.data',res.data)
+        if (res.data.center == 'null') {
+          this.$router.push({ name: '登录' })
+        } else {
+          // this.$cookies.set('center', res.data.center)
+          let center = res.data.center
+          console.log(center)
+          if(center.split(',').length ==2)
+          this.map.setCenter([center.split(',')[0], center.split(',')[1]])
+        }
+      })
+    },
+    changePanel() {
+      if (this.changeBtn == 'el-icon-caret-right') {
+        this.changeBtn = 'el-icon-caret-left'
+        this.changeWrapper = 0
+      } else if (this.changeBtn == 'el-icon-caret-left') {
+        this.changeBtn = 'el-icon-caret-right'
+        this.changeWrapper = 300
+      }
+    },
     stime(date) {
       return moment(date).format('YYYY-MM-DD HH:mm:ss')
     },
     stateType(row) {
-      if(new Date().getTime() - row.STIME > 1000*60*30){
+      if (new Date().getTime() - row.STIME > 1000 * 60 * 30) {
         return '离线'
-      }else{
-        if(row.STATE == '1') return '重车'
+      } else {
+        if (row.STATE == '1') return '重车'
         else return '空车'
       }
     },
+    speedType(row) {
+      if (new Date().getTime() - row.STIME > 1000 * 60 * 30) {
+        return '0'
+      } else {
+        return row.SPEED
+      }
+    },
     typeColor(row) {
-      if(new Date().getTime() - row.STIME > 1000*60*30){
+      if (new Date().getTime() - row.STIME > 1000 * 60 * 30) {
         return '#606266'
-      }else{
-        if(row.STATE == '1') return 'red'
+      } else {
+        if (row.STATE == '1') return 'red'
         else return '#005400'
       }
     },
     /**查询车辆**/
     getVehiMap() {
       axios.get('map/getMonitor', { baseURL }).then(res => {
-        console.log(res.data)
         this.vehicleData = Object.freeze(res.data.vehilist)
         this.vehicleStatus.emptyCar = res.data.num.emptyCar
         this.vehicleStatus.heavyCar = res.data.num.heavyCar
@@ -347,7 +510,6 @@ export default {
     /**查询故障车辆**/
     getAlarm() {
       axios.get('map/getAlarm', { baseURL }).then(res => {
-        console.log(res.data)
         this.table.alarmList = Object.freeze(res.data)
       })
     },
@@ -390,18 +552,18 @@ export default {
     },
     handleDialogDefineClick() {
       this.dialog.display = false
-      if(this.dialog.form.center == ''){
+      if (this.dialog.form.center == '') {
         this.$message({
           message: '消息内容不能为空！',
           type: 'warning'
-        });
+        })
         return
       }
       let params1 = new URLSearchParams()
       params1.append('vehi_no', this.dialog.form.mdt_no)
       params1.append('nr', this.dialog.form.center)
       axios.post('map/sendMessage', params1, { baseURL }).then(res => {
-        this.$message('下发成功');
+        this.$message('下发成功')
         // console.log(11,res.data)
       })
     },
@@ -412,25 +574,25 @@ export default {
       this.dialog.form.center = msg
     },
     handleDialogSubmit() {
-      if(this.dialog1.form.name == ''){
+      if (this.dialog1.form.name == '') {
         this.$message({
           message: '消息内容必能为空！',
           type: 'warning'
-        });
-        return;
+        })
+        return
       }
       let params = new URLSearchParams()
       params.append('info', this.dialog1.form.name)
-      if(this.dialog1.title == '添加') {
+      if (this.dialog1.title == '添加') {
         axios.post('map/addInfo', params, { baseURL }).then(res => {
-          this.$message(res.data.info);
+          this.$message(res.data.info)
           this.dialog1.display = false
           this.getMessageInfo()
         })
-      }else{
+      } else {
         params.append('id', this.dialog1.form.id)
         axios.post('map/editInfo', params, { baseURL }).then(res => {
-          this.$message(res.data.info);
+          this.$message(res.data.info)
           this.dialog1.display = false
           this.getMessageInfo()
         })
@@ -443,38 +605,39 @@ export default {
       this.dialog1.form.name = ''
     },
     handleMessageEditClick() {
-      if(this.messageIndex != ''){
+      if (this.messageIndex>=0) {
         this.dialog1.display = true
         this.dialog1.title = '修改'
         this.dialog1.form.id = this.messageList[this.messageIndex].ID
         this.dialog1.form.name = this.messageList[this.messageIndex].INFO
-      }else{
+      } else {
         this.$message({
           message: '请选择一条消息后修改！',
           type: 'warning'
-        });
+        })
       }
     },
     handleMessageDeleteClick() {
-      if(this.messageIndex != null){
+      if (this.messageIndex != null) {
         this.$confirm('此操作将永久删除该消息内容, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(() => {
-          let params = new URLSearchParams()
-          params.append('id', this.messageList[this.messageIndex].ID)
-          axios.post('map/delInfo', params, { baseURL }).then(res => {
-            this.$message(res.data.info);
-            this.getMessageInfo()
+        })
+          .then(() => {
+            let params = new URLSearchParams()
+            params.append('id', this.messageList[this.messageIndex].ID)
+            axios.post('map/delInfo', params, { baseURL }).then(res => {
+              this.$message(res.data.info)
+              this.getMessageInfo()
+            })
           })
-        }).catch(() => {
-        });
-      }else{
+          .catch(() => {})
+      } else {
         this.$message({
           message: '请选择一条消息后删除！',
           type: 'warning'
-        });
+        })
       }
     },
     initPage(PointSimplifier, $) {
@@ -1006,17 +1169,24 @@ export default {
           // this.infoWindow.close()
           _this.markerMouseout()
         })
+      let fangxiang = '';
+      if(isNaN(item.ANGLE)){
+        fangxiang = item.ANGLE
+      }else {
+        fangxiang = direction(item.ANGLE)
+      }
       const compName = item.COMP_NAME || ''
       const mdtNo = item.MDT_NO || ''
       const phoneNum = item.VEHI_SIM || ''
-      const speed = item.SPEED+'KM/S' || '无'
+      const speed = item.SPEED + 'KM/S' || '无'
       // const type = item.MDT_SUB_TYPE || ''
       const address = item.ADDRESS || ''
       const alarm = item.ALARMSTATUS || '无'
       const stime = formatterDateTime(item.STIME)
       const zdzlx = item.MDT_SUB_TYPE || ''
-      const kzczt = item.STATE == '1'?'重车':'空车'
-      let alarminfo = '',one = ''
+      const kzczt = item.STATE == '1' ? '重车' : '空车'
+      let alarminfo = '',
+        one = ''
       if (alarm.length == 8) {
         one = alarm.substring(7, 8)
         if (
@@ -1030,8 +1200,8 @@ export default {
           one == 'F'
         ) {
           alarminfo = '紧急报警'
-        }else alarminfo = '无'
-      }else alarminfo = '无'
+        } else alarminfo = '无'
+      } else alarminfo = '无'
       this.dialog.title = '消息下发' + (item.VEHI_NO && ' - ' + item.VEHI_NO)
       this.dialog.form.mdt_no = mdtNo
       this.dialog.form.center = ''
@@ -1039,19 +1209,20 @@ export default {
       let btnxxxf = $('<button>')
         .addClass('el-button el-button--primary is-plain el-button--mini')
         .text('消息下发')
-        .on('click',()=>{
+        .on('click', () => {
           this.dialog.display = true
         })
       let btnlsgj = $('<button>')
         .addClass('el-button el-button--primary is-plain el-button--mini')
         .text('历史轨迹')
-        .on('click',()=>{
+        .on('click', () => {
           // this.$store.commit('setHTAddress', item.VEHI_NO);
-          this.$cookies.set('setHTAddress', item.VEHI_NO)
-          this.$router.push({name: '历史轨迹'})
+          // this.$cookies.set('setHTAddress', item.VEHI_NO)
+          this.$router.push({ name: '历史轨迹 ',params:{'vehi_no': item.VEHI_NO} })
         })
+      // console.info('fangxiang', item.ANGLE)
       return $('<div>')
-        .addClass('tw-map-window')
+        .addClass('tw-map-window').css({'width':'300px'})
         .html([
           $('<div>')
             .addClass('tw-map-window-header')
@@ -1061,18 +1232,18 @@ export default {
             .html([
               `<div class="el-row"><div class="el-col el-col-6 tw-align-right">公司名称：</div><div class="el-col el-col-18">${compName}</div></div>`,
               `<div class="el-row"><div class="el-col el-col-6 tw-align-right">终端编号：</div><div class="el-col el-col-18">${mdtNo}</div></div>`,
-              `<div class="el-row"><div class="el-col el-col-6 tw-align-right">营运状态：</div><div class="el-col el-col-18">${kzczt}</div></div>`,
-              `<div class="el-row"><div class="el-col el-col-6 tw-align-right">SIM卡号：</div><div class="el-col el-col-18">${phoneNum}</div></div>`,
-              `<div class="el-row"><div class="el-col el-col-6 tw-align-right">GPS速度：</div><div class="el-col el-col-18">${speed}</div></div>`,
-              `<!--<div class="el-row"><div class="el-col el-col-6 tw-align-right">终端类型：</div><div class="el-col el-col-18"></div></div>-->`,
               `<div class="el-row"><div class="el-col el-col-6 tw-align-right">子类型：</div><div class="el-col el-col-18">${zdzlx}</div></div>`,
-              `<div class="el-row"><div class="el-col el-col-6 tw-align-right">报警状态：</div><div class="el-col el-col-18">${alarminfo}</div></div>`,
+              `<div class="el-row"><div class="el-col el-col-6 tw-align-right">SIM卡号：</div><div class="el-col el-col-18">${phoneNum}</div></div>`,
+              `<div class="el-row"><div class="el-col el-col-6 tw-align-right">营运状态：</div><div class="el-col el-col-6">${kzczt}</div><div class="el-col el-col-6 tw-align-right">报警状态：</div><div class="el-col el-col-6">${alarminfo}</div></div>`,
+              `<div class="el-row"><div class="el-col el-col-6 tw-align-right">GPS速度：</div><div class="el-col el-col-6">${speed}</div><div class="el-col el-col-6 tw-align-right">方向：</div><div class="el-col el-col-6">${fangxiang}</div></div>`,
               `<div class="el-row"><div class="el-col el-col-6 tw-align-right">定位时间：</div><div class="el-col el-col-18">${stime}</div></div>`,
               `<div class="el-row"><div class="el-col el-col-6 tw-align-right">当前地址：</div><div class="el-col el-col-18">${address}</div></div>`,
-              $('<div>').addClass('el-row').html([btnxxxf,btnlsgj])
+              $('<div>')
+                .addClass('el-row')
+                .html([btnxxxf, btnlsgj])
             ])
         ])
-    },
+    },//
     rowclick(row) {
       this.mapInfoOpen(row)
     },
@@ -1096,20 +1267,21 @@ export default {
         if (status === 'complete' && res.regeocode)
           item.ADDRESS = res.regeocode.formattedAddress
         else console.log('根据经纬度查询地址失败')
+          // item.ADDRESS =status === 'complete' && res.regeocode ? res.regeocode.formattedAddress  : '根据经纬度查询地址失败'
         newMapWindow(item)
       })
       newMapWindow(item)
       this.map.setCenter([item.PX, item.PY])
     },
     locationClick(targetName) {
-      if(targetName.label == '位置信息'){
-        if(!this.iswzjk){
+      if (targetName.label == '位置信息') {
+        if (!this.iswzjk) {
           clearInterval(this.setintervaltabList)
           this.tableList()
           this.setintervaltabList = setInterval(this.tableList, 30000)
         }
         this.iswzjk = true
-      }else {
+      } else {
         this.iswzjk = false
       }
     },
@@ -1118,13 +1290,13 @@ export default {
       _.map(this.table.data1, item => {
         vhic += "'" + item.VEHI_NO + "',"
       })
+      if(this.$route.path != '/cljk/wzjk') return
       let params = new URLSearchParams()
       params.append('type', '2')
       params.append('vhic', vhic.substring(0, vhic.length - 1))
       axios.post('map/getOneVhic', params, { baseURL }).then(res => {
-        this.table.data = res.data || []
-        this.table.monitorInfo = res.data || []
-        console.log(11,this.table.monitorInfo)
+        this.table.data = Object.freeze(res.data) || []
+        this.table.monitorInfo = Object.freeze(res.data) || []
         let alarm = '',
           one = '',
           two = ''
@@ -1179,21 +1351,27 @@ export default {
       _.map(this.table.data1, item => {
         vhic += "'" + item.VEHI_NO + "',"
       })
+      if(this.$route.path != '/cljk/wzjk') return
       let params = new URLSearchParams()
       params.append('time', this.table.time)
       params.append('vhic', vhic.substring(0, vhic.length - 1))
       axios.post('map/importantInfo', params, { baseURL }).then(res => {
-        this.table.importantInfo = res.data || []
+        this.table.importantInfo = Object.freeze(res.data) || []
       })
     },
     newsRelease() {
       this.dialog.display = true
     },
     formatterDirectionType,
-    formatterDateTime
+    formatterDateTime,
+    destroyedTimeOut() {
+       clearInterval(this.setintervaltabList)
+        clearInterval(this.setintervalInfo)
+    }
   },
   components: {
-    RealTimeMonitorVehiclePanel
+    RealTimeMonitorVehiclePanel,
+    draggable
   },
   destroyed() {
     if (this.setintervalLM) clearInterval(this.setintervalLM)
@@ -1201,10 +1379,9 @@ export default {
   },
   watch: {
     'table.positionInfo.data'(value) {
-      console.log(value)
       if (value.length == 0) {
-        clearInterval(this.setintervaltabList)
-        clearInterval(this.setintervalInfo)
+        if(this.setintervaltabList) clearInterval(this.setintervaltabList)
+        if(this.setintervalInfo) clearInterval(this.setintervalInfo)
         this.table.data = []
         this.table.data1 = []
         this.table.importantInfo = []

@@ -14,7 +14,8 @@
     <t-table-page :data="table.data" :loading="table.display" :page-size="20">
       <el-table-column type="index" label="序号" align="center" width="50" :resizable="false"></el-table-column>
       <el-table-column prop="STATION_NAME" label="岗位名" align="center" width="240"></el-table-column>
-      <el-table-column prop="STATION_JURI" label="岗位权限" :show-overflow-tooltip="true" align="center"  min-width="160" :resizable="false"></el-table-column>
+      <el-table-column prop="STATION_JURI" label="页面权限" :show-overflow-tooltip="true" align="center"  min-width="160" :resizable="false"></el-table-column>
+      <el-table-column prop="ALLOW_OPERATION_NAME" label="操作权限" :show-overflow-tooltip="true" align="center"  min-width="160" :resizable="false"></el-table-column>
       <el-table-column :resizable="false" width="100" align="center">
         <!--<template slot="header" slot-scope="scope">-->
           <!--<el-button size="mini" icon="el-icon-plus" @click="handleTableAddClick"></el-button>-->
@@ -36,6 +37,16 @@
               <span>{{module}}</span>
               <el-checkbox-group v-model="dialog.form.power_names" style="position: left;">
                 <el-checkbox v-for="item in select.power"  v-if="item.MODULE===module" :label="item.POWER" :key="item.POWER">{{item.POWER}}</el-checkbox>
+              </el-checkbox-group>
+            </div>
+          </template>
+        </el-form-item>
+        <el-form-item label="操作权限">
+          <template >
+            <div v-for="option_one in select.options">
+              <span>{{option_one.name}}</span>
+              <el-checkbox-group v-model="dialog.form.allow_operation_ids" >
+                <el-checkbox v-for="item in option_one.option"  :label="item.id" :key="item.id">{{item.name}}</el-checkbox>
               </el-checkbox-group>
             </div>
           </template>
@@ -72,7 +83,19 @@
         },
         select:{
           power: [],
-          module: []
+          module: [],
+          options:[
+            {
+              name:'爱心业务用车记录',
+              id:'axywycjl',
+              option:[
+                {name:'查询', id: 'axywycjl_query'},
+                {name:'添加', id: 'axywycjl_add'},
+                {name:'修改', id: 'axywycjl_update'},
+                {name:'删除', id: 'axywycjl_delete'},
+              ]
+            }
+          ]
         },
         dialog: {
           title: '',
@@ -81,6 +104,8 @@
             station: '',
             power_names: [],
             power_ids: [],
+            allow_operation_name: [],
+            allow_operation_ids: ['axywycjl_query']
           },
         }
       }
@@ -124,7 +149,8 @@
       },
       addJobManage(){
         this.dialog.form.power_ids = [];
-        const {station,power_names, power_ids} = this.dialog.form;
+        this.dialog.form.allow_operation_name = [];
+        const {station,power_names, power_ids, allow_operation_name, allow_operation_ids} = this.dialog.form;
         _.each(power_names,power=>{
           _.each(this.select.power,item=>{
             if(power===item.POWER){
@@ -132,7 +158,14 @@
             }
           })
         });
-        if(station===''||power_names.length===0||power_ids.length===0){
+        _.each(allow_operation_ids,allow=>{
+          _.each(this.select.options,item=>{
+            if(allow.substring(0,allow.lastIndexOf('_'))===item.id){
+              allow_operation_name.push(item.name+'('+_.filter(item.option,e=>{return allow===e.id})[0].name+')');
+            }
+          })
+        });
+        if(station===''||power_names.length===0||power_ids.length===0||allow_operation_name.length===0||allow_operation_ids.length===0){
           this.$message.error('请填写完整信息！');
           return false;
         }
@@ -141,7 +174,9 @@
           params: {
             station,
             power_ids: power_ids.toString(),
-            power_names: power_names.toString()
+            power_names: power_names.toString(),
+            allow_operation_name: allow_operation_name.toString(),
+            allow_operation_ids: allow_operation_ids.toString()
           }
         }).then(res => {
           if(res.data>0){
@@ -158,7 +193,8 @@
       },
       updateJobManage(){
         this.dialog.form.power_ids = [];
-        const {station,power_names, power_ids} = this.dialog.form;
+        this.dialog.form.allow_operation_name = [];
+        const {station,power_names, power_ids, allow_operation_name, allow_operation_ids} = this.dialog.form;
         _.each(power_names,power=>{
           _.each(this.select.power,item=>{
             if(power===item.POWER){
@@ -166,7 +202,14 @@
             }
           })
         });
-        if(station===''||power_names.length===0||power_ids.length===0){
+        _.each(allow_operation_ids,allow=>{
+          _.each(this.select.options,item=>{
+            if(allow.substring(0,allow.lastIndexOf('_'))===item.id){
+              allow_operation_name.push(item.name+'('+_.filter(item.option,e=>{return allow===e.id})[0].name+')');
+            }
+          })
+        });
+        if(station===''||power_names.length===0||power_ids.length===0||allow_operation_name.length===0||allow_operation_ids.length===0){
           this.$message.error('请填写完整信息！');
           return false;
         }
@@ -176,7 +219,9 @@
             id: this.table.selectItem.ID,
             station,
             power_ids: power_ids.toString(),
-            power_names: power_names.toString()
+            power_names: power_names.toString(),
+            allow_operation_name: allow_operation_name.toString(),
+            allow_operation_ids: allow_operation_ids.toString(),
           }
         }).then(res => {
           if(res.data>0){
@@ -206,6 +251,8 @@
         this.dialog.form.station = item.STATION_NAME;
         this.dialog.form.power_names = item.STATION_JURI.split(',');
         this.dialog.form.power_ids = item.POWER_IDS.split(',');
+        this.dialog.form.allow_operation_name = item.ALLOW_OPERATION_NAME.split(',');
+        this.dialog.form.allow_operation_ids = item.ALLOW_OPERATION_IDS.split(',');
       },
       handleTableDeleteClick(item) {
         this.$confirm('是否删除?', '提示', {
@@ -246,6 +293,8 @@
         this.dialog.form.station = '';
         this.dialog.form.power_names = [];
         this.dialog.form.power_ids = [];
+        this.dialog.form.allow_operation_name = [];
+        this.dialog.form.allow_operation_ids = ['axywycjl_query'];
         this.table.selectItem = [];
       },
       handleExportClick() {

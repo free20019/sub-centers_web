@@ -9,13 +9,14 @@ module.exports = {
   devServer: {
     port: 3000,
     proxy: {
-      '/api': {
-        // target: 'http://192.168.11.222:8080/subcenters/',
+      '/subcenters': {
+        // target: 'http://192.168.11.216:8086/subcenters/',
+        // target: 'http://60.191.5.236:8090/subcenters/',
         target: '',
         ws: true,
         changeOrigin: true,
         pathRewrite: {
-          '^/api': ''
+          '^/subcenters': ''
         }
       }
     }

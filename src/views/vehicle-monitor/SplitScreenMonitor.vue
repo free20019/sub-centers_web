@@ -123,6 +123,7 @@ export default {
       this.map.select = index;
     },
     getSplitScreenMonitor(vhic) {
+      if(this.$route.path != '/cljk/fpjk') return
       let mapvhic = 'mapvhic' + this.map.select;
       this.map[mapvhic] = vhic;
       let jwd = 'jwd' + this.map.select;

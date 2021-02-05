@@ -1,5 +1,5 @@
-<!-- 平台使用记录 -->
-<template>
+<!-- 终端报警-->
+<template xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
   <t-query-panel :model="query" footer="300">
     <template v-slot:querybar>
       <el-form-item>
@@ -10,12 +10,17 @@
       </el-form-item>
       <el-form-item>
         <el-autocomplete
-          v-model="query.company"
+          v-model="query.vehicle"
           :prefix-icon="iconClassName('icon-car')"
-          :fetch-suggestions="handleCompanyQuerySearch"
+          :fetch-suggestions="handleVehicleQuerySearch"
           :trigger-on-focus="false"
-          placeholder="公司名称"
+          placeholder="车牌号码"
         ></el-autocomplete>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="query.type" placeholder="报警类型" clearable>
+          <el-option v-for="item in getType" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleQueryClick">查询</el-button>
@@ -24,25 +29,28 @@
     </template>
     <t-table-page :data="table.data" :loading="table.display" :page-size="20">
       <el-table-column type="index" label="序号" align="center" width="50" :resizable="false"></el-table-column>
-      <el-table-column prop="USER_NAME" label="账号" width="240" align="center"></el-table-column>
-      <el-table-column prop="REAL_NAME" label="公司" width="380" align="center" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="LOGIN_TIME" label="登录时间" align="center"  min-width="360" :resizable="false"></el-table-column>
+      <el-table-column prop="VEHI_NO" label="车牌号码" align="center" width="220"></el-table-column>
+      <el-table-column prop="ALT_CAUSE" label="报警类型" align="center" width="220"></el-table-column>
+      <el-table-column prop="COUNT" label="次数" align="center" min-width="240"></el-table-column>
     </t-table-page>
   </t-query-panel>
 </template>
+
 <script>
   import moment from 'moment'
   import { iconClassName ,baseURL} from 'util'
   import axios from 'axios'
   import _ from 'underscore'
   export default {
-    name: 'PlatformUsageRecord',
+    name: 'TerminalAlarm',
     data() {
       return {
+        loginType:'',
         query: {
           startTime: '',
           endTime: '',
-          company: ''
+          vehicle: '',
+          type: '',
         },
         inputVehicle: {
           loading: false,
@@ -53,58 +61,64 @@
           data: []
         },
         select:{
-          company: [],
-        }
+          vehicle: [],
+        },
+        getType:[
+          {label: '超速报警', value: '超速报警'},
+          {label: '紧急报警', value: '紧急报警'},
+        ]
       }
     },
     mounted() {
-      this.query.startTime = new Date(moment().add('day', -1));
+      this.query.startTime = new Date();
       this.query.endTime = new Date();
-      this.findPlatformUsageRecord();
-      this.getCompany();
+      this.findTerminalAlarm();
+      this.getVehicle();
     },
     methods: {
       iconClassName,
-      handleCompanyQuerySearch(query, cb) {
-        cb(_.filter(this.select.company, item => item.value.indexOf(query) > -1))
+      handleVehicleQuerySearch(query, cb) {
+        if (query.length < 3) return cb([])
+        cb(_.filter(this.select.vehicle, item => item.value.indexOf(query) > -1))
       },
-      getCompany(){
-        axios.get('common/company', {
+      getVehicle(){
+        axios.get('common/vehicle', {
           baseURL,
-          params: {
-            type:1
-          }
+          params: {}
         }).then(res=> {
-          this.select.company = _.map(res.data, item => {
+          this.select.vehicle = _.map(res.data, item => {
             return {
-              value: item.COMPANY_NAME
+              value: item.VEHICLE_NO
             }
           });
         }).catch(function (error) {
+          console.log(error);
         });
       },
-      findPlatformUsageRecord() {
-        const {startTime, endTime, company} = this.query;
+      findTerminalAlarm() {
+        const {startTime, endTime, vehicle, type} = this.query;
         this.table.display = true;
-        axios.get('basicData/findPlatformUsageRecord', {
+        axios.get('dataStatistics/findTerminalAlarm', {
           baseURL,
           params: {
             startTime: startTime && moment(startTime).format('YYYY-MM-DD'),
             endTime: endTime && moment(endTime).format('YYYY-MM-DD'),
-            company
+            vehicle,
+            type,
           }
         }).then(res=> {
           this.table.data = res.data||[];
           this.table.display = false;
         }).catch(function (error) {
+          console.log(error);
         });
       },
       /*事件*/
       handleQueryClick() {
-        this.findPlatformUsageRecord();
+        this.findTerminalAlarm();
       },
       handleExportClick() {
-        const {startTime, endTime, company} = this.query;
+        const {startTime, endTime, vehicle, type} = this.query;
         this.$confirm('是否需要导出?', '提示', {
           confirmButtonText: '是',
           cancelButtonText: '否',
@@ -113,7 +127,7 @@
           type: 'info',
           center: true
         }).then(() => {
-          window.open(`${baseURL}basicData/findPlatformUsageRecordExcel?startTime=${startTime && moment(startTime).format('YYYY-MM-DD')}&endTime=${endTime && moment(endTime).format('YYYY-MM-DD')}&company=${company}`);
+          window.open(`${baseURL}dataStatistics/findTerminalAlarmExcel?startTime=${startTime && moment(startTime).format('YYYY-MM-DD')}&endTime=${endTime && moment(endTime).format('YYYY-MM-DD')}&vehicle=${vehicle}&type=${type}`);
         }).catch(() => {
 
         });
@@ -121,6 +135,3 @@
     }
   }
 </script>
-
-
-

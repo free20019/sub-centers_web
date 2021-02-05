@@ -39,6 +39,11 @@ const router = new Router({
           component: () => import('./views/vehicle-monitor/HistoricalTrack.vue')
         },
         {
+          path: '/cljk/lsgj/:vehi_no',
+          name: '历史轨迹 ',
+          component: () => import('./views/vehicle-monitor/HistoricalTrack.vue')
+        },
+        {
           path: '/cljk/qyjk',
           name: '区域监控',
           component: () => import('./views/vehicle-monitor/RegionalMonitor.vue')
@@ -134,6 +139,11 @@ const router = new Router({
           name: '投诉查询',
           component: () => import('./views/query-analysis/ComplaintInquiry.vue')
         },
+        {
+          path: '/cljk/dxbjjl',
+          name: '短信报警记录',
+          component: () => import('./views/query-analysis/MessageAlarmRecord.vue')
+        },
         /**数据查询 */
         {
           path: '/sjtj/szltj',
@@ -194,6 +204,18 @@ const router = new Router({
           name: '无签到签退',
           component: () =>
             import('./views/data-statistics/UnSignInAndSignOff.vue')
+        },
+        {
+          path: '/sjtj/zdbj',
+          name: '终端报警',
+          component: () =>
+            import('./views/data-statistics/TerminalAlarm.vue')
+        },
+        {
+          path: '/sjtj/csbj',
+          name: '超速报警',
+          component: () =>
+            import('./views/data-statistics/SpeedAlarm.vue')
         },
         /**基础数据 */
         {
@@ -291,7 +313,46 @@ const router = new Router({
           path: '/hjgl/bgtj',
           name: '变更统计',
           component: () => import('./views/mail-manage/ChangeStatistics.vue')
-        }
+        },
+        {
+          path: '/hjgl/axywycjl',
+          name: '爱心业务用车记录',
+          component: () => import('./views/mail-manage/LoveBusinessVehicleUseRecord.vue')
+        },
+        {
+          path: '/hjgl/cljsygl',
+          name: '爱心驾驶员信息管理',
+          component: () => import('./views/mail-manage/VehicleDiverManagement.vue')
+        },
+        {
+          path: '/hjgl/qycljsyxxgl',
+          name: '企业车辆驾驶员信息管理',
+          component: () => import('./views/mail-manage/DriverInformationManagement.vue')
+        },
+                /** 终端设置 */
+        {
+          path: '/zdsz/fwpjsj',
+          name: '服务评价数据',
+          component: () =>
+            import('./views/terminal-settings/ServiceEvaluationData.vue')
+        },
+        {
+          path: '/zdsz/xxxf',
+          name: '消息下发',
+          component: () => import('./views/terminal-settings/MessageSent.vue')
+        },
+        {
+          path: '/zdsz/ddsjtc',
+          name: '顶灯数据透传',
+          component: () =>
+            import('./views/terminal-settings/CeilingLampDataTransmission.vue')
+        },
+        {
+          path: '/zdsz/jjbjclcl',
+          name: '紧急报警车辆处理',
+          component: () =>
+            import('./views/terminal-settings/EmergencyAlarmVehicle.vue')
+        }
       ]
     },
     {

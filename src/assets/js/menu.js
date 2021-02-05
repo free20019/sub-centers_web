@@ -27,6 +27,7 @@ const menuList = [
     icon: 'icon-mail-manage',
     fullPath: '/hjgl'
   },
+  { id: 'zdsz', title: '终端设置', icon: 'icon-basic-data', fullPath: '/zdsz' },
   { id: 'jcsj', title: '基础数据', icon: 'icon-basic-data', fullPath: '/jcsj' }
 ]
 
@@ -168,6 +169,12 @@ const childrenMenuList = {
       title: '投诉查询',
       icon: 'tw-img-complaint-inquiry',
       href: '/cljk/tscx'
+    },
+    {
+      id: 'dxbjjl',
+      title: '短信报警记录',
+      icon: 'tw-img-message-record',
+      href: '/cljk/dxbjjl'
     }
   ],
   sjtj: [
@@ -230,6 +237,18 @@ const childrenMenuList = {
       title: '无签到签退',
       icon: 'tw-img-no-sign-check-out',
       href: '/sjtj/wqdqt'
+    },
+    {
+      id: 'zdbj',
+      title: '终端报警',
+      icon: 'tw-img-no-aerial-vehicle-change',
+      href: '/sjtj/zdbj'
+    },
+    {
+      id: 'csbj',
+      title: '超速报警',
+      icon: 'tw-img-no-aerial-vehicle-change',
+      href: '/sjtj/csbj'
     }
   ],
   jcsj: [
@@ -245,12 +264,12 @@ const childrenMenuList = {
       icon: 'tw-img-area-manage',
       href: '/jcsj/qygl'
     },
-    // {
-    //   id: 'dzwlgl',
-    //   title: '电子围栏管理',
-    //   icon: 'icon-kefu',
-    //   href: '/jcsj/dzwlgl'
-    // },
+    {
+      id: 'dzwlgl',
+      title: '电子围栏管理',
+      icon: 'tw-img-area-manage',
+      href: '/jcsj/dzwlgl'
+    },
     {
       id: 'ptsyjl',
       title: '平台使用记录',
@@ -337,6 +356,50 @@ const childrenMenuList = {
       title: '变更统计',
       icon: 'tw-img-change-statistics',
       href: '/hjgl/bgtj'
+    },
+    {
+      id: 'axywycjl',
+      title: '爱心业务用车记录',
+      icon: 'tw-img-change-statistics',
+      href: '/hjgl/axywycjl'
+    },
+    {
+      id: 'cljsygl',
+      title: '爱心驾驶员信息管理',
+      icon: 'tw-img-change-statistics',
+      href: '/hjgl/cljsygl'
+    },
+    {
+      id: 'qycljsyxxgl',
+      title: '企业车辆驾驶员信息管理',
+      icon: 'tw-img-change-statistics',
+      href: '/hjgl/qycljsyxxgl'
+    }
+  ],
+  zdsz: [
+    {
+      id: 'fwpjsj',
+      title: '服务评价数据',
+      icon: 'tw-img-change-statistics',
+      href: '/zdsz/fwpjsj'
+    },
+    {
+      id: 'zdxxxf',
+      title: '消息下发',
+      icon: 'tw-img-message',
+      href: '/zdsz/xxxf'
+    },
+    {
+      id: 'ddsjtc',
+      title: '顶灯数据透传',
+      icon: 'tw-img-message',
+      href: '/zdsz/ddsjtc'
+    },
+    {
+      id: 'jjbjclcl',
+      title: '紧急报警车辆处理',
+      icon: 'tw-img-area-manage',
+      href: '/zdsz/jjbjclcl'
     }
   ]
 }

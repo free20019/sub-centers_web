@@ -61,6 +61,7 @@ $layout-left_width__hover: 300px;
     }
   }
   &-body {
+    position: relative;
     height: 100%;
     transition: width 0.5s ease-in-out, height 0.5s ease-in-out, margin-left 0.5s ease-in-out,
       margin-right 0.5s ease-in-out;

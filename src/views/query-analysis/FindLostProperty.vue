@@ -67,6 +67,12 @@
                 @click="handleCloseMapClick"
                 >清除地图</el-button
               >
+              <el-button
+                class="button"
+                type="primary"
+                @click="displayDialog"
+                >弹出框</el-button
+              >
             </div>
           </el-form-item>
         </el-form>
@@ -104,7 +110,15 @@
                     type="text"
                     size="small"
                     icon="el-icon-search"
+                    title="轨迹"
                     @click="handleTableRowClick(scope.row)"
+                  ></el-button>
+                  <el-button
+                    type="text"
+                    size="small"
+                    icon="el-icon-data-line"
+                    title="回放"
+                    @click="displayDialog(scope.row)"
                   ></el-button>
                 </template>
               </el-table-column>
@@ -175,6 +189,53 @@
             </el-table>
           </el-tab-pane>
         </el-tabs>
+        <el-dialog
+          class="tw-dialog"
+          title="轨迹"
+          :visible.sync="dialog.dialogVisible"
+          @opened="initMapDialog"
+          @closed="distoryMap"
+          width="80%">
+          <el-form :inline="true" size="medium" class="demo-form-inline">
+            <el-form-item label="起始时间">
+              <el-date-picker
+                class="tw-input-date1"
+                v-model="dialog.stime"
+                type="datetime"
+                placeholder="开始时间"
+              ></el-date-picker
+              >&nbsp;
+              <el-date-picker
+                class="tw-input-date1"
+                v-model="dialog.etime"
+                type="datetime"
+                placeholder="开始时间"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="车牌号码">
+              <el-select
+                v-model="dialog.vhic"
+                :remote-method="handleVehicleQueryRemoteMethod"
+                remote
+                filterable
+                reserve-keyword
+                placeholder="车牌号码"
+              >
+                <el-option
+                  v-for="item in dialog.vehicleOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="dialogHistory">查询</el-button>
+            </el-form-item>
+          </el-form>
+          <div style="width:100%;height:500px;" id="dialogMap"
+          v-loading="dialog.loading"></div>
+        </el-dialog>
       </div>
     </template>
   </t-layout>
@@ -223,6 +284,20 @@ export default {
         startPoint: [],
         endPoint: [],
         vehicle: []
+      },
+      dialog: {
+        dialogVisible: false,
+        dialogMap: null,
+        stime: '',
+        etime: '',
+        vhic: '',
+        vehicleOptions: [],
+        polyline: null,
+        startMarker: null,
+        endMarker: null,
+        polyline: [],
+        polylineMarker: [],
+        loading: false
       }
     }
   },
@@ -232,6 +307,8 @@ export default {
     var endTime = new Date()
     this.query.startPointSTime = this.query.endPointSTime = startTime
     this.query.startPointETime = this.query.endPointETime = endTime
+    this.dialog.stime = startTime
+    this.dialog.etime = endTime
     this.$nextTick(() => {
       this.initMap()
     })
@@ -248,6 +325,87 @@ export default {
     }
   },
   methods: {
+    handleVehicleQueryRemoteMethod(query) {
+      if (query.length < 3) return
+      this.getVehicleList(query)
+    },
+    getVehicleList(value) {
+      const params = new URLSearchParams()
+      params.append('vhic', value)
+      return axios.post('map/getHisVhic', params, { baseURL }).then(res => {
+        this.dialog.vehicleOptions = _.map(res.data, item => {
+          return { value: item.VEHI_NO, label: item.VEHI_NO }
+        })
+      })
+    },
+    // 初始化地图
+    initMapDialog() {
+      this.dialog.dialogMap = new AMap.Map('dialogMap', {
+          resizeEnable: true, //是否监控地图容器尺寸变化
+          zoom:11 //初始化地图层级
+      });
+      this.dialogHistory()
+    },
+    distoryMap() {
+      this.dialog.dialogMap && this.dialog.dialogMap.destroy();
+    },
+    displayDialog(item) {
+      this.dialog.vhic = item.vehi_no
+      this.dialog.dialogVisible = true
+    },
+    dialogHistory() {
+      this.dialog.loading = true
+      this.dialog.dialogMap.clearMap()
+      var params = new URLSearchParams()
+      params.append('vhic', this.dialog.vhic)
+      params.append('stime', formatterDateTime(this.dialog.stime))
+      params.append('etime', formatterDateTime(this.dialog.etime))
+      axios.post('map/getHistory', params, { baseURL }).then(res => {
+        this.dialog.loading = false
+        console.log(res.data)
+        const polylinePath = []
+        _.each(res.data, item => {
+          this.createMarkerDialog(item)
+          polylinePath.push([item.PX, item.PY])
+        })
+        if (polylinePath.length > 0) this.openDrawRouteMapDialog(polylinePath)
+        else this.$message({ message: '无数据', type: 'warning' })
+      })
+    },
+    // 添加marker
+    createMarkerDialog(item) {
+      var marker = new AMap.Marker({
+        position: new AMap.LngLat(item.PX, item.PY),
+        icon: this.mapIconType(item.STATE),
+        angle: item.ANGLE || item.DIRECTION,
+        offset: new AMap.Pixel(0, -10),
+        anchor: 'center',
+        title: item.COMP_NAME
+      })
+      AMap.event.addListener(marker, 'click', () => {
+        this.createMapWindow(item, marker, this.dialog.dialogMap)
+      })
+      this.dialog.polylineMarker.push(marker)
+      this.dialog.dialogMap.add(marker)
+    },
+    // 绘制线路
+    openDrawRouteMapDialog(path) {
+      this.dialog.startMarker = new AMap.Marker({
+        position: path[0],
+        icon: startIconMarker,
+        offset: new AMap.Pixel(-15, -38)
+      })
+      this.dialog.endMarker = new AMap.Marker({
+        position: path[path.length - 1],
+        icon: endIconMarker,
+        offset: new AMap.Pixel(-15, -38)
+      })
+      this.dialog.polyline = new AMap.Polyline({ path: path })
+      this.dialog.dialogMap.add(this.dialog.polyline)
+      this.dialog.dialogMap.add(this.dialog.startMarker)
+      this.dialog.dialogMap.add(this.dialog.endMarker)
+      this.dialog.dialogMap.setFitView(this.dialog.polyline)
+    },
     // 失物招领
     getLostFound() {
       const {
@@ -492,7 +650,7 @@ export default {
         title: item.COMP_NAME
       })
       AMap.event.addListener(marker, 'click', () => {
-        this.createMapWindow(item, marker)
+        this.createMapWindow(item, marker, this.amap)
       })
       this.map.polylineMarker.push(marker)
       this.amap.add(marker)
@@ -501,7 +659,7 @@ export default {
     routeLineToList(item) {
       return `${item.lng},${item.lat}`
     },
-    createMapWindow(item, marker) {
+    createMapWindow(item, marker, map) {
       const lngLat = [item.PX, item.PY]
       const newMapWindow = item => {
         this.map.window = new AMap.InfoWindow({
@@ -509,16 +667,16 @@ export default {
           content: this.createMapWindowHtml(item)[0],
           offset: new AMap.Pixel(0, -15)
         })
-        this.map.window.open(this.amap, marker.getPosition())
+        this.map.window.open(map, marker.getPosition())
       }
       this.map.geocoder.getAddress(lngLat, (status, res) => {
         if (status === 'complete' && res.regeocode)
           item.address = res.regeocode.formattedAddress
         else log.error('根据经纬度查询地址失败')
-        newMapWindow(item)
+        newMapWindow(item, map)
       })
-      newMapWindow(item)
-      this.amap.setCenter(new AMap.LngLat(item.PX, item.PY))
+      newMapWindow(item, map)
+      map.setCenter(new AMap.LngLat(item.PX, item.PY))
     },
     createMapWindowHtml(item) {
       console.info('createMapWindowHtml:', item.address)
@@ -538,7 +696,7 @@ export default {
       const phoneNum = item.VEHI_SIM || ''
       const speed = item.SPEED+'KM/S' || '无'
       // const type = item.MDT_SUB_TYPE || ''
-      const stime = formatterDateTime(item.STIME)
+      const stime = formatterDateTime(item.SPEED_TIME)
       const zdzlx = item.MDT_SUB_TYPE || ''
       const kzczt = item.STATE == '1'?'重车':'空车'
       const address = item.address || ''
@@ -587,5 +745,12 @@ export default {
 .left-tabs {
   height: calc(100% - 313px);
   min-height: 350px;
+}
+.tw-input-date1 {
+  width: 200px;
+  // padding-right: 10px;
+  &:last-child {
+    padding-right: 0;
+  }
 }
 </style>

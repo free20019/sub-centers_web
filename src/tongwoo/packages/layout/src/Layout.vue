@@ -19,6 +19,12 @@
       <div class="tw-control-strip" v-if="leftStrip"></div>
     </div>
     <div class="tw-layout-body" v-if="$slots.default" :style="layoutBodyStyle">
+      <div
+        class="tw-left-change-btn"
+        :class="changeBtn"
+        @click="changePanel"
+        v-if="leftBtnStrip"
+      ></div>
       <slot></slot>
     </div>
     <div class="tw-layout-right" v-if="$slots.right" :style="layoutRightWidth">
@@ -35,7 +41,11 @@
       :style="layoutFooterHeigth"
     >
       <slot name="footer"></slot>
-      <div class="tw-control-strip" v-if="footerStrip" @mousedown="handleFooterStripMousedown"></div>
+      <div
+        class="tw-control-strip"
+        v-if="footerStrip"
+        @mousedown="handleFooterStripMousedown"
+      ></div>
     </div>
   </div>
 </template>
@@ -57,7 +67,8 @@ export default {
         mousedown: false,
         mousePoint: null,
         offset: 0
-      }
+      },
+      changeBtn: 'el-icon-caret-right'
     }
   },
   props: {
@@ -98,6 +109,11 @@ export default {
       default: 40
     },
     footerStrip: {
+      type: Boolean,
+      default: false
+    },
+    // 是否可以收缩左侧面板
+    leftBtnStrip: {
       type: Boolean,
       default: false
     }
@@ -156,6 +172,15 @@ export default {
     }
   },
   methods: {
+    changePanel() {
+      if (this.changeBtn == 'el-icon-caret-right') {
+        this.changeBtn = 'el-icon-caret-left'
+        this.layoutSize.left = 0
+      } else if (this.changeBtn == 'el-icon-caret-left') {
+        this.changeBtn = 'el-icon-caret-right'
+        this.layoutSize.left = 300
+      }
+    },
     handleLayoutMousemove() {
       const { y } = event
       if (this.$slots.footer) {

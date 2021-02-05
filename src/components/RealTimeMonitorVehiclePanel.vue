@@ -2,7 +2,8 @@
   <div class="tw-template-wrapper">
     <t-card-query height="300px">
       <template v-slot:query>
-        <el-input v-show="is_display"
+        <el-input
+          v-show="is_display"
           class="tw-panel__query-input"
           v-model="companyName"
           placeholder="请输入公司名称"
@@ -26,56 +27,105 @@
             class="tw-panel__query-input"
             :fetch-suggestions="querySearchAsync"
             :placeholder="queryPlaceholderInfo"
-            style="width: calc(100% - 41px); float:left;margin-right: -1px;"
+            style="width: calc(100% - 82px); float:left;margin-right: -1px;"
             v-model="vehicle"
             :clearable="true"
             popper-class="vehicleWidth"
             @select="handleSelect"
           ></el-autocomplete>
         </el-tooltip>
+        <el-button
+          type="danger"
+          @click="delTableInfo()"
+          icon="el-icon-delete"
+        ></el-button>
         <el-button icon="el-icon-search"></el-button>
       </template>
-      <pl-table :datas="vehicleList"
-                class="tw-table tw-table__towLines tw-item__click"
-                big-data-checkbox
-                ref="vehicleTableLeft"
-                size="mini"
-                header-drag-style
-                :pagination-show=false
-                use-virtual
-                @selection-change="changeVhic"
-                @row-dblclick="tableDblick">
+      <pl-table
+        :datas="vehicleList"
+        class="tw-table tw-table__towLines tw-item__click"
+        big-data-checkbox
+        ref="vehicleTableLeft"
+        size="mini"
+        header-drag-style
+        :pagination-show="false"
+        @selection-change="changeVhic"
+        @row-dblclick="tableDblick"
+      >
+        <!-- use-virtual-->
         <!--show-overflow-tooltip属性代表超出则内容部分给出提示框-->
-        <pl-table-column v-if="ischeckbox" type="selection" align="center" width="55"/>
-        <pl-table-column prop="SPEED" min-width="120" align="center" label="车牌" style="color: black">
+        <pl-table-column
+          v-if="ischeckbox"
+          type="selection"
+          align="center"
+          width="55"
+        />
+        <pl-table-column
+          prop="SPEED"
+          min-width="120"
+          align="center"
+          label="车牌"
+          style="color: black"
+        >
           <template v-slot="scope">
-          <span :class="['tw-radius', scope.row.VEHI_DONOT]"></span>
-          {{scope.row.VEHI_NO}}
+            <span :class="['tw-radius', scope.row.VEHI_DONOT]"></span>
+            {{ scope.row.VEHI_NO }}
           </template>
         </pl-table-column>
-        <pl-table-column prop="SPEED" align="center" label="速度"/>
+        <!--<pl-table-column prop="SPEED" align="center" label="速度" /> -->
+        <pl-table-column
+                prop="SPEED"
+                label="速度"
+                align="center"
+              >
+              <template slot-scope="scope">
+                  <span
+                    v-text="speedType(scope.row)"
+                  ></span>
+                </template>
+              </pl-table-column>
       </pl-table>
     </t-card-query>
     <div class="tw-list tw-vehicle-status">
-      <el-badge class="tw-list-item" type="info" :value="vehicleTypeNum.lx" :max="999">
+      <el-badge
+        class="tw-list-item"
+        type="info"
+        :value="vehicleTypeNum.lx"
+        :max="999"
+      >
         <div class="tw-list-wrapper" @click="statusSelection(1)">
           <t-icon class="tw-list-item__icon" name="icon-car"></t-icon>
           <span>离线</span>
         </div>
       </el-badge>
-      <el-badge class="tw-list-item" type="success" :value="vehicleTypeNum.kc" :max="999">
+      <el-badge
+        class="tw-list-item"
+        type="success"
+        :value="vehicleTypeNum.kc"
+        :max="999"
+      >
         <div class="tw-list-wrapper" @click="statusSelection(2)">
           <t-icon class="tw-list-item__icon" name="icon-car"></t-icon>
           <span>空车</span>
         </div>
       </el-badge>
-      <el-badge class="tw-list-item" type="danger" :value="vehicleTypeNum.zc" :max="999">
+      <el-badge
+        class="tw-list-item"
+        type="danger"
+        :value="vehicleTypeNum.zc"
+        :max="999"
+      >
         <div class="tw-list-wrapper" @click="statusSelection(3)">
           <t-icon class="tw-list-item__icon" name="icon-car"></t-icon>
           <span>重车</span>
         </div>
       </el-badge>
-      <el-badge class="tw-list-item" type="warning" :value="vehicleTypeNum.bj" :max="999">
+      <el-badge
+        class="tw-list-item"
+        type="warning"
+        :value="vehicleTypeNum.bj"
+        :max="999"
+      >
         <div class="tw-list-wrapper" @click="statusSelection(4)">
           <t-icon class="tw-list-item__icon" name="icon-car"></t-icon>
           <span>报警</span>
@@ -113,9 +163,16 @@ export default {
       },
       is_display: false,
       loginType: '',
-      columns: [
-        {}
-      ]
+      columns: [{}],
+      setinterInfo: {
+        type : 0,
+        timedRefresh: null,
+        data: {
+          label: '',
+          value: null,
+          cp: null
+        }
+      }
     }
   },
   props: {
@@ -152,9 +209,7 @@ export default {
     vhic(val) {
       this.checkVehicleList = val
     },
-    vehicleList(value) {
-      console.log(value)
-    }
+    vehicleList(value) {}
   },
   methods: {
     /**车辆查找输入框中输入3位以上显示内容**/
@@ -170,6 +225,13 @@ export default {
         )
       })
     },
+    speedType(row) {
+      if (new Date().getTime() - row.STIME > 1000 * 60 * 30) {
+        return '0'
+      } else {
+        return row.SPEED
+      }
+    },
     /**查询车辆**/
     getVehiList(val) {
       let params = new URLSearchParams()
@@ -178,15 +240,34 @@ export default {
     },
     /**车辆查找输入框中输入3位以上显示内容后选中一条后执行**/
     handleSelect(item) {
+      console.log(item,item.label)
       let params = new URLSearchParams()
       params.append('type', '1')
       params.append('vhic', item.label)
       axios.post('map/getOneVhic', params, { baseURL }).then(res => {
+        this.setinterInfo.type = 1
+        this.setinterInfo.data.label = item.label
         this.statisticalReset()
         this.vehicleList = res.data
         this.statisticalResults()
+        // this.timedRefresh()
       })
     },
+    /*定时刷新左侧下方表格内容*/
+    // timedRefresh() {
+    //   clearInterval(this.setinterInfo.timedRefresh)
+    //   let _this = this
+    //   if(this.setinterInfo.type ==0){
+    //     // this.setinterInfo.timedRefresh = setInterval(this.handleNodeClick[this.setinterInfo.data], 30000)
+    //     this.setinterInfo.timedRefresh = setInterval( () => {
+    //       _this.handleNodeClick(this.setinterInfo.data)
+    //     }, 30000)
+    //   }else if(this.setinterInfo.type == 1) setInterval(this.test,10000)
+    //     // this.setinterInfo.timedRefresh = setInterval(this.handleSelect(this.setinterInfo.data), 30000)
+    //     this.setinterInfo.timedRefresh = setInterval(() => {
+    //       _this.handleSelect(this.setinterInfo.data)
+    //     }, 30000)
+    // },
     /**对树节点进行筛选时执行的方法，返回 true 表示这个节点可以显示，返回 false 则表示这个节点会被隐藏**/
     filterNode(value, data) {
       if (!value) return true
@@ -196,35 +277,40 @@ export default {
     handlegetCompTree() {
       let loginType = this.$cookies.get('loginType')
       this.loginType = loginType
-      if(loginType == '0'){
+      if (loginType == '0') {
         // this.loginType.compDisplay = true
         this.is_display = true
         axios.get('map/getComp', { baseURL }).then(res => {
-          this.companyList = res.data || []
+          this.companyList = Object.freeze(res.data) || []
         })
-      }else if(loginType == '1'){
+      } else if (loginType == '1') {
         axios.get('map/getClzTree', { baseURL }).then(res => {
-          this.companyList = res.data || []
+          this.companyList = Object.freeze(res.data) || []
         })
       }
     },
     /**公司树结构点击事件 */
     handleNodeClick(data) {
       let params = new URLSearchParams()
-      if(this.loginType == '0'){
+      if (this.loginType == '0') {
         params.append('id', data.value)
         axios.post('map/getVhicList', params, { baseURL }).then(res => {
-          this.statisticalReset()
-          this.vehicleList = res.data
-          this.statisticalResults()
-        })
-      }else if(this.loginType == '1'){
-       console.log(data)
-        params.append('cp', data.cp)
-        axios.post('map/getClzVhic', params, { baseURL }).then(res => {
+          this.setinterInfo.type = 0
+          this.setinterInfo.data.value = data.value
           this.statisticalReset()
           this.vehicleList = Object.freeze(res.data)
           this.statisticalResults()
+          // this.timedRefresh()
+        })
+      } else if (this.loginType == '1') {
+        params.append('cp', data.cp)
+        axios.post('map/getClzVhic', params, { baseURL }).then(res => {
+          this.setinterInfo.type = 0
+          this.setinterInfo.data.cp = data.cp
+          this.statisticalReset()
+          this.vehicleList = Object.freeze(res.data)
+          this.statisticalResults()
+          // this.timedRefresh()
         })
       }
     },
@@ -241,7 +327,6 @@ export default {
      * @param {*} rows :选中的数据
      */
     tableToggleSelection(rows) {
-      console.log(this.$refs.vehicleTableLeft)
       if (rows) {
         rows.forEach(row => {
           this.$refs.vehicleTableLeft.$refs.singleTable.toggleRowSelection(row)
@@ -305,6 +390,16 @@ export default {
         this.tableToggleSelection(this.vehicleTypeNum.bjlist)
         return
       }
+    },
+    /**
+     * @description: 点击删除按钮 删除表格的数据
+     * @param {type}
+     * @return:
+     */
+
+    delTableInfo() {
+      this.$emit('clear-table')
+      this.vehicleList = []
     }
   }
 }

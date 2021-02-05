@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { hasArray } from 'util'
+import axios from 'axios'
+import { hasArray,baseURL } from 'util'
 
 Vue.use(Vuex)
 
@@ -20,7 +21,7 @@ export default new Vuex.Store({
     },
     cleanHTAddress(state){
       state.cphm = '';
-    }
+    },
   },
   actions: {}
 })
